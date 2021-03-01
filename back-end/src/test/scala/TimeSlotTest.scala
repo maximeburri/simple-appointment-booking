@@ -13,7 +13,7 @@ class TimeSlotTest extends AnyFlatSpec with should.Matchers {
     val day = DateTime.parse("2021-03-01")
 
     // Test with two schedule slot, no booked slots, 30 minutes
-    Booking.freeSlots(
+    Booking.computeFreeSlots(
       List(
         ScheduleSlot(10.hours, 11.hours),
         ScheduleSlot(14.hours, 15.hours + 30.minutes)
@@ -32,7 +32,7 @@ class TimeSlotTest extends AnyFlatSpec with should.Matchers {
     )
 
     // Test with two schedule slot (in two days), 2 booked slots, 30 minutes
-    Booking.freeSlots(
+    Booking.computeFreeSlots(
       List(
         ScheduleSlot(0.day + 10.hours, 0.day + 11.hours), // Monday
         ScheduleSlot(1.day + 13.hours, 1.day + 15.hours + 30.minutes) // Tuesday
