@@ -54,7 +54,7 @@
     </div>
     <div style="margin: 10px;">
       <mat-radio-group required aria-label="Appointments" formControlName="appointmentDatetime">
-        <mat-radio-button *ngFor="let slot of freeSlots" [value]="slot">{{slot}}</mat-radio-button><br />
+          <mat-radio-button *ngFor="let slot of freeSlots" [value]="slot">{{slot}}</mat-radio-button>
       </mat-radio-group>
     </div>
     <div style="margin: 10px;" [hidden]="!form.controls.appointmentDatetime.value">

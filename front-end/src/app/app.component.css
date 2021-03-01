@@ -1,8 +1,12 @@
 mat-card {
     max-width: 900px;
-    margin-top: 10px;
+    margin: 24px;
 }
 
 td {
     padding-right: 10px !important;
+}
+
+mat-radio-button {
+    display: block;
 }
