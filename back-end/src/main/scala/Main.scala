@@ -80,9 +80,9 @@ object BookingAPI {
   ).flatten
 
   var appointments: List[Appointment] = List(
-    Appointment(DateTime.parse("2021-03-01T10:00:00"), firstConsultation, maximeInfo),
-    Appointment(DateTime.parse("2021-03-01T14:00:00"), followUpConsultation, maximeInfo),
-    Appointment(DateTime.parse("2021-03-02T11:00:00"), followUpConsultation, maximeInfo),
+    Appointment(DateTime.now().plus(10.hours.toDuration), firstConsultation, maximeInfo),
+    Appointment(DateTime.now().plus(14.hours.toDuration), followUpConsultation, maximeInfo),
+    Appointment(DateTime.now().plus(1.days + 10.hours), followUpConsultation, maximeInfo),
   )
 
 
