@@ -1,0 +1,8 @@
+mat-card {
+    max-width: 900px;
+    margin-top: 10px;
+}
+
+td {
+    padding-right: 10px !important;
+}
