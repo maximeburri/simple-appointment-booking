@@ -30,6 +30,13 @@ case class Appointment(begin: DateTime, appointmentType: AppointmentType, userIn
   def toTimeSlot() = TimeSlot(begin, begin + appointmentType.duration)
 }
 
+case class AppointmentDTO(begin: DateTime, appointmentTypeId: Int, userInformation: UserInformation){
+  def toAppointment(l: List[AppointmentType]) = Appointment(begin,
+    l.find(_.id == appointmentTypeId).head,
+    userInformation
+  )
+}
+
 object BookingAPI {
 
   // needed to run the route
@@ -70,11 +77,6 @@ object BookingAPI {
       ScheduleSlot(4.days + 15.hours, 4.days + 17.hours)
     ),
 
-    // Fake sunday for testing
-    /*List(
-      ScheduleSlot(6.days + 10.hours, 6.days + 13.hours),
-      ScheduleSlot(6.days + 15.hours, 6.days + 17.hours),
-    )*/
   ).flatten
 
   var appointments: List[Appointment] = List(
@@ -115,6 +117,7 @@ object BookingAPI {
   implicit val appointmentTypeFormat = jsonFormat3(AppointmentType)
   implicit val userInfoFormat = jsonFormat6(UserInformation)
   implicit val appointmentFormat = jsonFormat3(Appointment)
+  implicit val appointmentDTOFormat = jsonFormat3(AppointmentDTO)
 
   def listAppointments(): Future[List[Appointment]] = Future {
     appointments
@@ -129,9 +132,13 @@ object BookingAPI {
     } yield Booking.freeSlots(
       scheduleSlotsWeekly,
       appointments.map(_.toTimeSlot()),
-      DateTime.parse("2021-03-01"), // DateTime.now()
+      DateTime.now(),
       appointmentTypes.find(_.id == id).head.duration
     )
+  }
+
+  def addAppointments(appointment: Appointment) = Future {
+    appointments = appointments.appended(appointment).sortBy(_.begin)
   }
 
   def main(args: Array[String]): Unit = {
@@ -147,6 +154,16 @@ object BookingAPI {
             pathPrefix("freeSlots") {
               parameter("id".as[Int]) {
                 id: Int => onComplete(freeSlots(id)) { a => complete(a) }
+              }
+            }
+          },
+          post {
+            pathPrefix("appointment") {
+              entity(as[AppointmentDTO]) { appointment =>
+                println("Appiintment...")
+                onComplete(addAppointments(appointment.toAppointment(appointmentTypes))) {
+                  _ => complete("OK")
+                }
               }
             }
           }

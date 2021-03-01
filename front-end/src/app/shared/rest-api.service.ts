@@ -15,6 +15,12 @@ export interface AppointmentType {
   duration: String;
 } 
 
+export interface BookAppointment {
+  begin: String;
+  appointmentTypeId: number;
+  userInformation: UserInformation;
+}
+
 export interface UserInformation{
   firstName: String,
   lastName: String,
@@ -40,14 +46,17 @@ export class RestApiService {
   }
 
   // HttpClient API get() method => Fetch employee
-   getAppointments(): Observable<Array<Appointment>> {
+  getAppointments(): Observable<Array<Appointment>> {
     return this.http.get<Array<Appointment>>(this.apiURL + '/appointments')
 
   }  
 
   getFreeSlots(id: number): Observable<Array<String>> {
     return this.http.get<Array<String>>(this.apiURL + '/freeSlots?id=' + id.toString())
+  }  
 
+  addAppointment(appointment: BookAppointment): Observable<any> {
+    return this.http.post<any>(this.apiURL + '/appointment', appointment, {responseType: 'text' as 'json'})
   }  
 
 }

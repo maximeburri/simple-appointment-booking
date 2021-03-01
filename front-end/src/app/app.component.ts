@@ -1,5 +1,4 @@
-import { RestApiService, Appointment } from './shared/rest-api.service';
-import { _YAxis } from '@angular/cdk/scrolling';
+import { RestApiService, Appointment, BookAppointment } from './shared/rest-api.service';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -24,7 +23,7 @@ export class AppComponent {
     lastName: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required]),
     birthDate: new FormControl('', [Validators.required]),
-    phoneNumber: new FormControl('', [Validators.required]),
+    phone: new FormControl('', [Validators.required]),
     description: new FormControl(''),
   });
 
@@ -36,8 +35,26 @@ export class AppComponent {
 
   onSubmit() {
     console.log("Submit");
-    this.updateAppointments();
-    this.form.reset();
+    console.log(this.form.value);
+
+    if(this.selectedAppointmentType !== undefined){
+      let bookAppointment: BookAppointment = {
+        begin: this.form.controls.appointmentDatetime.value,
+        appointmentTypeId: this.selectedAppointmentType,
+        userInformation: {
+          ...this.form.value,
+          birthDate: this.form.value.birthDate.toString()
+        }
+      }
+      console.log(bookAppointment)
+
+      this.restApi.addAppointment(bookAppointment).subscribe(() => {
+        this.selectedAppointmentType = undefined;
+        this.freeSlots = [];
+        this.updateAppointments();
+        this.form.reset();
+      });
+    }
   }
 
   updateAppointments() {
@@ -46,7 +63,6 @@ export class AppComponent {
       this.appointments = data
     })
   }
-
 
   updateFreeSlots() {
     if(this.selectedAppointmentType !== undefined)
