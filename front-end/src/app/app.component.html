@@ -46,8 +46,8 @@
       <mat-form-field appearance="fill" >
         <mat-label>Type</mat-label>
         <mat-select [(value)]="selectedAppointmentType" name="selectedAppointmentType"  (selectionChange)="updateFreeSlots()"> 
-          <mat-option *ngFor="let type of types" [value]="type.id">
-            {{type.title}}
+          <mat-option *ngFor="let appointmentType of appointmentTypes" [value]="appointmentType.id">
+            {{appointmentType.name}}
           </mat-option>
         </mat-select>
       </mat-form-field>

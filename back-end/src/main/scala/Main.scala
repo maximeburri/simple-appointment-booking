@@ -137,8 +137,12 @@ object BookingAPI {
     )
   }
 
-  def addAppointments(appointment: Appointment) = Future {
+  def addAppointments(appointment: Appointment): Future[Unit] = Future {
     appointments = appointments.appended(appointment).sortBy(_.begin)
+  }
+
+  def listAppointmentTypes(): Future[List[AppointmentType]] = Future {
+    appointmentTypes
   }
 
   def main(args: Array[String]): Unit = {
@@ -157,32 +161,20 @@ object BookingAPI {
               }
             }
           },
+          get {
+            pathPrefix("appointmentTypes") {
+              onComplete(listAppointmentTypes()) { a => complete(a) }
+            }
+          },
           post {
             pathPrefix("appointment") {
               entity(as[AppointmentDTO]) { appointment =>
-                println("Appiintment...")
                 onComplete(addAppointments(appointment.toAppointment(appointmentTypes))) {
                   _ => complete("OK")
                 }
               }
             }
           }
-
-          // TODO:
-          // 1) POST: book a slots...
-          // 2) update
-          /*
-          Exemple:
-        post {
-          path("create-order") {
-            entity(as[Order]) { order =>
-              val saved: Future[Done] = saveOrder(order)
-              onSuccess(saved) { _ => // we are not interested in the result value `Done` but only in the fact that it was successful
-                complete("order created")
-              }
-            }
-          }
-        }*/
         )
       }
 

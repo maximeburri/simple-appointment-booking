@@ -1,6 +1,7 @@
-import { RestApiService, Appointment, BookAppointment } from './shared/rest-api.service';
+import { RestApiService, Appointment, BookAppointment, AppointmentType } from './shared/rest-api.service';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { _YAxis } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ export class AppComponent {
 
   title = 'booking';
   selectedAppointmentType : number | undefined = undefined;
-  types = [{title:"First consultation", id: 0}, {title: "Follow-up consultation", id: 1}]; // TODO: from api
+  appointmentTypes: Array<AppointmentType> = []; // TODO: from api
 
   appointments: Array<Appointment> = [];
   displayedColumns: string[] = ['DateTime', 'Type', 'User', 'Description'];
@@ -31,6 +32,7 @@ export class AppComponent {
 
   constructor(public restApi: RestApiService) {
     this.updateAppointments()
+    this.updateAppointmentTypes();
   }
 
   onSubmit() {
@@ -69,5 +71,11 @@ export class AppComponent {
       this.restApi.getFreeSlots(this.selectedAppointmentType).subscribe((data: Array<String>) => {
         this.freeSlots = data
       })
+  }
+
+  updateAppointmentTypes() {
+    this.restApi.getAppointmentTypes().subscribe((data) => {
+      this.appointmentTypes = data;
+    })
   }
 }
