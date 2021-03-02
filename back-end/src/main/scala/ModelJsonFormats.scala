@@ -1,4 +1,4 @@
-package ch.onedoc
+package ch.burri
 
 import com.github.nscala_time.time.Imports.{DateTime, Period}
 import spray.json.DefaultJsonProtocol.{jsonFormat3, jsonFormat6}

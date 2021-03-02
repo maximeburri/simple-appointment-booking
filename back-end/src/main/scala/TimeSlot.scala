@@ -1,4 +1,4 @@
-package ch.onedoc
+package ch.burri
 
 import com.github.nscala_time.time.Imports._
 import org.joda.time.DateTimeConstants
@@ -49,17 +49,23 @@ object Booking {
                      res: List[TimeSlot]): List[TimeSlot] = {
     freeSlots match {
       case Nil => res.reverse
-      case slot :: tailSlot => bookedSlot match {
+      case slot :: tailFreeSlots => bookedSlot match {
+          // End
         case Nil => (res.reverse ::: freeSlots)
-        case a :: t if a.end <= slot.begin =>
-          splitFreeSlots(freeSlots, t, res)
-        case a :: _ if a.begin >= slot.end =>
-          splitFreeSlots(tailSlot, bookedSlot, slot :: res)
-        case a :: t if a.begin >= slot.begin && slot.end >= a.end =>
+          // Booked slot begin is passed with current slot
+        case h :: t if h.end <= slot.begin =>
+          splitFreeSlots(freeSlots, t, res) // next booked slot
+          // Booked slot after is passed with current slot
+        case h :: _ if h.begin >= slot.end =>
+          splitFreeSlots(tailFreeSlots, bookedSlot, slot :: res) // next free slot
+          // In the current slot: split free slot in two
+        case h :: t =>
           splitFreeSlots(
-            TimeSlot(a.end, slot.end) :: tailSlot,
+            TimeSlot(
+              if (h.end < slot.end) h.end else slot.end,
+              slot.end) :: tailFreeSlots,
             t,
-            TimeSlot(slot.begin, a.begin) :: res
+            TimeSlot(slot.begin, h.begin) :: res
           )
       }
     }

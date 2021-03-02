@@ -1,4 +1,4 @@
-package ch.onedoc
+package ch.burri
 
 import org.scalatest._
 import flatspec._

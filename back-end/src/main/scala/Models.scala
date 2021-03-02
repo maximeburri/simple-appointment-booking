@@ -1,4 +1,4 @@
-package ch.onedoc
+package ch.burri
 import com.github.nscala_time.time.Imports.{DateTime, Period}
 import com.github.nscala_time.time.Imports._
 import org.joda.time.DateTimeConstants
