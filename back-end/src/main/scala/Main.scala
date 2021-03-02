@@ -43,12 +43,18 @@ object BookingAPI {
         } ~
         get {
           pathPrefix("freeSlots") {
-            parameter("id".as[Int]) {
-              id: Int => {
-                  onComplete(db.getFreeSlots(id, DateTime.now(), 5)) { a =>
-                    println(a.failed)
-                    complete(a)
-                  }
+            parameters("id".as[Int], "page".as[Int].withDefault(0)) {
+              (id: Int, page: Int) => {
+                val nbDays = 7
+                val fromDay = {
+                  if(page == 0) DateTime.now()
+                  else DateTime.now().withTimeAtStartOfDay().plusDays(page * nbDays)
+                }
+
+                onComplete(db.getFreeSlots(id, fromDay, nbDays)) { a =>
+                  println(a.failed)
+                  complete(a)
+                }
               }
             }
           }
