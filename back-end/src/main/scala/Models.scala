@@ -1,7 +1,7 @@
 package ch.onedoc
-import ch.onedoc.BookingAPI.db
 import com.github.nscala_time.time.Imports.{DateTime, Period}
 import com.github.nscala_time.time.Imports._
+import org.joda.time.DateTimeConstants
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -20,26 +20,28 @@ case class Appointment(begin: DateTime, appointmentType: AppointmentType, userIn
 
 // Generic database
 trait Database {
-  def getScheduleSlots()(implicit ec: ExecutionContext): Future[List[ScheduleSlot]]
+  def getScheduleSlots()(implicit ec: ExecutionContext): Future[WeeklyScheduleSlots]
   def getAppointmentTypes()(implicit ec: ExecutionContext): Future[List[AppointmentType]]
   def getAppointments()(implicit ec: ExecutionContext): Future[List[Appointment]]
   def addAppointment(appointment: Appointment)(implicit ec: ExecutionContext): Future[Unit]
 
   // Compute free slots
-  def getFreeSlots(appointmentTypeId: Int)(implicit ec: ExecutionContext): Future[List[DateTime]] = {
+  def getFreeSlots(appointmentTypeId: Int, fromDay: DateTime, nbDays: Int)(implicit ec: ExecutionContext): Future[List[DateTime]] = {
     val slotsFuture = this.getScheduleSlots()
     val appointmentsFuture = this.getAppointments()
     val appointmentTypesFuture = this.getAppointmentTypes()
 
     for {
-      scheduleSlotsWeekly <- slotsFuture
+      weeklyScheduleSlots <- slotsFuture
       appointments <- appointmentsFuture
       appointmentTypes <- appointmentTypesFuture
     } yield Booking.computeFreeSlots(
-      scheduleSlotsWeekly,
+      weeklyScheduleSlots,
       appointments.map(_.toTimeSlot()),
-      DateTime.now(),
+      fromDay,
+      nbDays,
       appointmentTypes.find(_.id == appointmentTypeId).head.duration
+
     )
   }
 }
@@ -64,35 +66,36 @@ case class FakeDatabase() extends Database {
   )
 
   // Schedule slots
-  val scheduleSlotsWeekly: List[ScheduleSlot] = List(
-    // Mon-thursday: 9h - 12h
-    List(0.days, 1.days, 2.days, 3.days)
-      .map(day => ScheduleSlot(day + 9.hours, day + 12.hours)),
-
-    // Mon-thursday expected wednesday: 14h - 16h
-    List(0.days, 1.days, 3.days)
-      .map(day => ScheduleSlot(day + 14.hours, day + 16.hours)),
-
-    // Friday
-    List(
-      ScheduleSlot(4.days + 10.hours, 4.days + 13.hours),
-      ScheduleSlot(4.days + 15.hours, 4.days + 17.hours)
+  val weeklyScheduleSlots = WeeklyScheduleSlots(Map(
+    DateTimeConstants.MONDAY -> List(
+      ScheduleSlot(9.hours, 12.hours),
+      ScheduleSlot(14.hours, 16.hours)
     ),
+    DateTimeConstants.TUESDAY -> List(
+      ScheduleSlot(9.hours, 12.hours),
+      ScheduleSlot(14.hours, 16.hours)
+    ),
+    DateTimeConstants.WEDNESDAY -> List(
+      ScheduleSlot(9.hours, 12.hours)
+    ),
+    DateTimeConstants.THURSDAY -> List(
+      ScheduleSlot(9.hours, 12.hours),
+      ScheduleSlot(14.hours, 16.hours)
+    ),
+    DateTimeConstants.FRIDAY -> List(
+      ScheduleSlot(10.hours, 13.hours),
+      ScheduleSlot(15.hours, 17.hours)
+    )
+  ))
 
-  ).flatten
-
-  var appointments: List[Appointment] = List(
-    Appointment(DateTime.now().plus(10.hours.toDuration), firstConsultation, maximeInfo),
-    Appointment(DateTime.now().plus(14.hours.toDuration), followUpConsultation, maximeInfo),
-    Appointment(DateTime.now().plus(1.days + 10.hours), followUpConsultation, maximeInfo),
-  )
+  var appointments: List[Appointment] = List()
 
   override def addAppointment(appointment: Appointment)(implicit ec: ExecutionContext) = Future {
     appointments = appointments.appended(appointment).sortBy(_.begin)
   }
 
-  override def getScheduleSlots()(implicit ec: ExecutionContext): Future[List[ScheduleSlot]] = Future {
-    scheduleSlotsWeekly
+  override def getScheduleSlots()(implicit ec: ExecutionContext): Future[WeeklyScheduleSlots] = Future {
+    weeklyScheduleSlots
   }
 
   override def getAppointmentTypes()(implicit ec: ExecutionContext): Future[List[AppointmentType]] = Future {

@@ -1,11 +1,10 @@
 package ch.onedoc
 
-import scala.collection.mutable.Stack
-import collection.mutable.Stack
 import org.scalatest._
 import flatspec._
 import matchers._
 import com.github.nscala_time.time.Imports._
+import org.joda.time.DateTimeConstants
 
 class TimeSlotTest extends AnyFlatSpec with should.Matchers {
 
@@ -14,12 +13,15 @@ class TimeSlotTest extends AnyFlatSpec with should.Matchers {
 
     // Test with two schedule slot, no booked slots, 30 minutes
     Booking.computeFreeSlots(
-      List(
-        ScheduleSlot(10.hours, 11.hours),
-        ScheduleSlot(14.hours, 15.hours + 30.minutes)
-      ),
+      WeeklyScheduleSlots(Map(
+        DateTimeConstants.MONDAY -> List(
+          ScheduleSlot(10.hours, 11.hours),
+          ScheduleSlot(14.hours, 15.hours + 30.minutes)
+        )
+      )),
       List(),
       day,
+      5,
       30.minutes
     ) should be (
       List(
@@ -33,15 +35,20 @@ class TimeSlotTest extends AnyFlatSpec with should.Matchers {
 
     // Test with two schedule slot (in two days), 2 booked slots, 30 minutes
     Booking.computeFreeSlots(
-      List(
-        ScheduleSlot(0.day + 10.hours, 0.day + 11.hours), // Monday
-        ScheduleSlot(1.day + 13.hours, 1.day + 15.hours + 30.minutes) // Tuesday
-      ),
+      WeeklyScheduleSlots(Map(
+        DateTimeConstants.MONDAY -> List(
+          ScheduleSlot(10.hours, 11.hours)
+        ),
+        DateTimeConstants.TUESDAY -> List(
+          ScheduleSlot(13.hours, 15.hours + 30.minutes)
+        )
+      )),
       List(
         TimeSlot(day.plus(10.hours.toDuration), day.plus(10.hours + 30.minutes.toDuration)),
         TimeSlot(day.plus(1.day + 13.hours + 15.minutes), day.plus(1.day + 14.hours + 15.minutes))
       ),
       day,
+      5,
       30.minutes
     ) should be (List(
       day.plus(10.hours + 30.minutes.toDuration),

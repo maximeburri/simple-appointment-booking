@@ -5,12 +5,12 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.github.nscala_time.time.Imports.DateTime
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import spray.json.DefaultJsonProtocol._
 
 import scala.io.StdIn
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import org.joda.time.DateTime
 
 import scala.util.control.NonFatal
 
@@ -24,9 +24,7 @@ case class BookAppointmentDTO(begin: DateTime, appointmentTypeId: Int, userInfor
 object BookingAPI {
   import ModelJsonFormats._
 
-  import akka.http.scaladsl.model._
   import akka.http.scaladsl.server._
-  import StatusCodes._
   import Directives._
 
   implicit val system = ActorSystem(Behaviors.empty, "AppointmentBooking")
@@ -46,8 +44,11 @@ object BookingAPI {
         get {
           pathPrefix("freeSlots") {
             parameter("id".as[Int]) {
-              id: Int => onComplete(db.getFreeSlots(id)) { a => {
-                complete(a)}
+              id: Int => {
+                  onComplete(db.getFreeSlots(id, DateTime.now(), 5)) { a =>
+                    println(a.failed)
+                    complete(a)
+                  }
               }
             }
           }
