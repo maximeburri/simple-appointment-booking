@@ -47,7 +47,7 @@ object BookingAPI {
               (id: Int, page: Int) => {
                 val nbDays = 7
                 val fromDay = {
-                  if(page == 0) DateTime.now()
+                  if(page <= 0) DateTime.now()
                   else DateTime.now().withTimeAtStartOfDay().plusDays(page * nbDays)
                 }
 
