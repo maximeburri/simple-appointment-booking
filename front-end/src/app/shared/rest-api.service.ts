@@ -1,3 +1,4 @@
+import { getLocaleDateTimeFormat } from '@angular/common';
 import { HttpClient, HttpHeaderResponse, HttpHeaders } from '@angular/common/http';
 import { StringMap } from '@angular/compiler/src/compiler_facade_interface';
 import { Injectable, Optional } from '@angular/core';
@@ -40,24 +41,15 @@ export interface AppointmentType {
   providedIn: 'root'
 })
 export class RestApiService {
-  apiURL = 'http://localhost:8080';
+  apiURL = 'http://localhost:8080'; //TODO: move in env vars
   constructor(private http: HttpClient) { }
 
-
-  // Http Options
-  httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json'
-    })
-  }
-
-  // HttpClient API get() method => Fetch employee
   getAppointments(): Observable<Array<Appointment>> {
     return this.http.get<Array<Appointment>>(this.apiURL + '/appointments')
   }
 
-  getFreeSlots(id: number): Observable<Array<String>> {
-    return this.http.get<Array<String>>(this.apiURL + '/freeSlots?id=' + id.toString())
+  getFreeSlots(id: number): Observable<Array<Date>> {
+    return this.http.get<Array<Date>>(this.apiURL + '/freeSlots?id=' + id.toString())
   }
   
   getAppointmentTypes(): Observable<Array<AppointmentType>> {

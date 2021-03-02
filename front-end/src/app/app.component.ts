@@ -16,7 +16,7 @@ export class AppComponent {
 
   appointments: Array<Appointment> = [];
   displayedColumns: string[] = ['DateTime', 'Type', 'User', 'Description'];
-  freeSlots: Array<String> = [];
+  freeSlots: Array<Date> = [];
 
   form = new FormGroup({
     appointmentDatetime: new FormControl('', [Validators.required]),
@@ -45,7 +45,7 @@ export class AppComponent {
         appointmentTypeId: this.selectedAppointmentType,
         userInformation: {
           ...this.form.value,
-          birthDate: this.form.value.birthDate.toString()
+          birthDate: this.form.value.birthDate.toISOString().slice(0, 10)
         }
       }
       console.log(bookAppointment)
@@ -68,7 +68,7 @@ export class AppComponent {
 
   updateFreeSlots() {
     if(this.selectedAppointmentType !== undefined)
-      this.restApi.getFreeSlots(this.selectedAppointmentType).subscribe((data: Array<String>) => {
+      this.restApi.getFreeSlots(this.selectedAppointmentType).subscribe((data: Array<Date>) => {
         this.freeSlots = data
       })
   }

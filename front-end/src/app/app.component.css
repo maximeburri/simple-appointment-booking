@@ -10,3 +10,12 @@ td {
 mat-radio-button {
     display: block;
 }
+
+.mat-table {
+    margin: 10px;
+}
+
+mat-card-title {
+    padding: 10px;
+    color: #3f51b5ed;
+}
