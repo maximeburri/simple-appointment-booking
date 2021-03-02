@@ -37,6 +37,8 @@ export interface AppointmentType {
   duration: String
 }
 
+export type FreeSlots = Map<string, Array<Date>>
+
 @Injectable({
   providedIn: 'root'
 })
@@ -48,8 +50,8 @@ export class RestApiService {
     return this.http.get<Array<Appointment>>(this.apiURL + '/appointments')
   }
 
-  getFreeSlots(id: number, numPage: number): Observable<Array<Date>> {
-    return this.http.get<Array<Date>>(this.apiURL + '/freeSlots?id=' + id.toString() + '&page=' + numPage.toString())
+  getFreeSlots(id: number, numPage: number): Observable<FreeSlots> {
+    return this.http.get<FreeSlots>(this.apiURL + '/freeSlots?id=' + id.toString() + '&page=' + numPage.toString())
   }
   
   getAppointmentTypes(): Observable<Array<AppointmentType>> {

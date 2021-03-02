@@ -1,4 +1,4 @@
-import { RestApiService, Appointment, BookAppointment, AppointmentType } from './shared/rest-api.service';
+import { RestApiService, Appointment, BookAppointment, AppointmentType, FreeSlots } from './shared/rest-api.service';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { _YAxis } from '@angular/cdk/scrolling';
@@ -16,7 +16,7 @@ export class AppComponent {
 
   appointments: Array<Appointment> = [];
   displayedColumns: string[] = ['DateTime', 'Type', 'User', 'Description'];
-  freeSlots: Array<Date> = [];
+  freeSlots: FreeSlots = new Map();
   freeSlotsPage: number = 0;
 
   form = new FormGroup({
@@ -52,7 +52,7 @@ export class AppComponent {
 
       this.restApi.addAppointment(bookAppointment).subscribe(() => {
         this.selectedAppointmentType = undefined;
-        this.freeSlots = [];
+        this.freeSlots = new Map();
         this.updateAppointments();
         this.form.reset();
         this.freeSlotsPage = 0;
@@ -79,7 +79,7 @@ export class AppComponent {
 
   updateFreeSlots() {
     if(this.selectedAppointmentType !== undefined)
-      this.restApi.getFreeSlots(this.selectedAppointmentType, this.freeSlotsPage).subscribe((data: Array<Date>) => {
+      this.restApi.getFreeSlots(this.selectedAppointmentType, this.freeSlotsPage).subscribe((data) => {
         this.freeSlots = data
       })
   }

@@ -50,9 +50,10 @@ object BookingAPI {
                   if(page <= 0) DateTime.now()
                   else DateTime.now().withTimeAtStartOfDay().plusDays(page * nbDays)
                 }
+                val freeSlots = db.getFreeSlots(id, fromDay, nbDays)
+                  .map(_.groupBy(_.withTimeAtStartOfDay()))
 
-                onComplete(db.getFreeSlots(id, fromDay, nbDays)) { a =>
-                  println(a.failed)
+                onComplete(freeSlots) { a =>
                   complete(a)
                 }
               }

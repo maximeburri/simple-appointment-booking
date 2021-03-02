@@ -61,7 +61,13 @@
         <mat-icon aria-hidden="false" aria-label="Calendar">keyboard_arrow_left</mat-icon> Previous 7 days
     </a>
       <mat-radio-group required aria-label="Appointments" formControlName="appointmentDatetime">
-          <mat-radio-button *ngFor="let slot of freeSlots" [value]="slot">{{slot | date:'medium' }}</mat-radio-button>
+          <div *ngFor="let slotDay of freeSlots | keyvalue" style="margin:5px;">
+            <b>{{slotDay.value[0] | date}}: </b>
+            <mat-radio-button *ngFor="let slot of slotDay.value" [value]="slot">
+              {{slot | date: 'shortTime'}}
+            </mat-radio-button>
+          </div>
+          
       </mat-radio-group>
       <a [hidden]="selectedAppointmentType === undefined"
         mat-raised-button color="primary" (click)="nextSlots()"  style="margin: 5px;">
