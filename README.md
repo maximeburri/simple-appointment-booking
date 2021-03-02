@@ -37,6 +37,7 @@ Lastly enjoy in a browser to http://localhost:4200/ !
 - integration tests
 - more checks of form values in back-end
 - more logging
+- improve error handling in communication front-end/back-end
 - user management
 - ...
 
