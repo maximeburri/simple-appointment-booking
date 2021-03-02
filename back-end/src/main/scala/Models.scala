@@ -9,7 +9,7 @@ case class AppointmentType(id: Int, name: String, duration: Period)
 
 case class UserInformation(firstName: String,
                            lastName: String,
-                           birthDate: String,
+                           birthDate: DateTime,
                            phone: String,
                            email: String,
                            description: Option[String] = None)
@@ -49,7 +49,7 @@ case class FakeDatabase() extends Database {
   val maximeInfo = UserInformation(
     firstName = "Maxime",
     lastName = "Burri",
-    birthDate = "2020-02-25",
+    birthDate = DateTime.parse("1995-02-25"),
     phone = "07655544433",
     email = "max@bu.ch",
     description = None

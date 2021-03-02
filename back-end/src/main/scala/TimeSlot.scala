@@ -28,7 +28,7 @@ object Booking {
         case Nil => (res.reverse ::: freeSlots)
         case a :: t if a.end <= slot.begin =>
           splitFreeSlots(freeSlots, t, res)
-        case a :: t if a.begin >= slot.end =>
+        case a :: _ if a.begin >= slot.end =>
           splitFreeSlots(tailSlot, bookedSlot, slot :: res)
         case a :: t if a.begin >= slot.begin && slot.end >= a.end =>
           splitFreeSlots(

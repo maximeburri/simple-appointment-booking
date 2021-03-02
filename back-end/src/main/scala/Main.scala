@@ -5,12 +5,14 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.github.nscala_time.time.Imports.{DateTime}
-
+import com.github.nscala_time.time.Imports.DateTime
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import spray.json.DefaultJsonProtocol._
+
 import scala.io.StdIn
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+
+import scala.util.control.NonFatal
 
 case class BookAppointmentDTO(begin: DateTime, appointmentTypeId: Int, userInformation: UserInformation){
   def toAppointment(l: List[AppointmentType]) = Appointment(begin,
@@ -22,6 +24,11 @@ case class BookAppointmentDTO(begin: DateTime, appointmentTypeId: Int, userInfor
 object BookingAPI {
   import ModelJsonFormats._
 
+  import akka.http.scaladsl.model._
+  import akka.http.scaladsl.server._
+  import StatusCodes._
+  import Directives._
+
   implicit val system = ActorSystem(Behaviors.empty, "AppointmentBooking")
   implicit val executionContext = system.executionContext
   implicit val bookAppointmentFormat = jsonFormat3(BookAppointmentDTO)
@@ -31,37 +38,37 @@ object BookingAPI {
   def main(args: Array[String]): Unit = {
     val route: Route =
       cors() { // To disable in production
-        concat(
-          get {
-            pathPrefix("appointments") {
-              onComplete(db.getAppointments()) { a => complete(a) }
-            }
-          },
-          get {
-            pathPrefix("freeSlots") {
-              parameter("id".as[Int]) {
-                id: Int => onComplete(db.getFreeSlots(id)) { a => complete(a) }
-              }
-            }
-          },
-          get {
-            pathPrefix("appointmentTypes") {
-              onComplete(db.getAppointmentTypes()) { a => complete(a) }
-            }
-          },
-          post {
-            pathPrefix("appointment") {
-              entity(as[BookAppointmentDTO]) { bookAppointment =>
-                onComplete(for {
-                  types <- db.getAppointmentTypes()
-                  res <- db.addAppointment(bookAppointment.toAppointment(types))
-                } yield res) {
-                  _ => complete("OK")
-                }
+        get {
+          pathPrefix("appointments") {
+            onComplete(db.getAppointments()) { a => complete(a) }
+          }
+        } ~
+        get {
+          pathPrefix("freeSlots") {
+            parameter("id".as[Int]) {
+              id: Int => onComplete(db.getFreeSlots(id)) { a => {
+                complete(a)}
               }
             }
           }
-        )
+        } ~
+        get {
+          pathPrefix("appointmentTypes") {
+            onComplete(db.getAppointmentTypes()) { a => complete(a) }
+          }
+        } ~
+        post {
+          pathPrefix("appointment") {
+            entity(as[BookAppointmentDTO]) { bookAppointment =>
+              onComplete(for {
+                types <- db.getAppointmentTypes()
+                res <- db.addAppointment(bookAppointment.toAppointment(types))
+              } yield res) {
+                _ => complete("OK")
+              }
+            }
+          }
+        }
       }
 
     val bindingFuture = Http().newServerAt("localhost", 8080).bind(route)
