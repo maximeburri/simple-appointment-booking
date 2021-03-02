@@ -1,5 +1,5 @@
 # Simple Appointment Booking Application
-A basic appointment booking web application with Scala (akka-http) and Angular
+A basic appointment booking web application with Scala (akka-http) and Angular, an exercice mainly developed in 11 hours.
 
 ## Features
 A user can:
@@ -29,11 +29,15 @@ npm install
 ng serve
 ```
 
-Finally enjoy in a browser to http://localhost:4200/
+Lastly enjoy in a browser to http://localhost:4200/ !
 
 ## Todo
-- docker files
+- config files and environment variables (e.g. port and urls)
+- docker files / CI build
 - integration tests
-- more check of form values in back-end
+- more checks of form values in back-end
+- more logging
 - user management
+- ...
+
 
