@@ -2,7 +2,8 @@
   <mat-card-title>
     <mat-icon aria-hidden="false" aria-label="Calendar">list</mat-icon> Appointments
   </mat-card-title>
-  <table mat-table [dataSource]="appointments" class="mat-elevation-z8">
+  <i [hidden]="appointments.length != 0" >Nothing for the moment, add one bellow!</i>
+  <table mat-table [hidden]="appointments.length == 0" [dataSource]="appointments" class="mat-elevation-z8">
 
     <!--- Note that these columns can be defined in any order.
           The actual rendered columns are set as a property on the row definition" -->
