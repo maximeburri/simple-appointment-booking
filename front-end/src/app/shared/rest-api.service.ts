@@ -48,8 +48,8 @@ export class RestApiService {
     return this.http.get<Array<Appointment>>(this.apiURL + '/appointments')
   }
 
-  getFreeSlots(id: number): Observable<Array<Date>> {
-    return this.http.get<Array<Date>>(this.apiURL + '/freeSlots?id=' + id.toString())
+  getFreeSlots(id: number, numPage: number): Observable<Array<Date>> {
+    return this.http.get<Array<Date>>(this.apiURL + '/freeSlots?id=' + id.toString() + '&page=' + numPage.toString())
   }
   
   getAppointmentTypes(): Observable<Array<AppointmentType>> {
