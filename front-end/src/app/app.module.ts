@@ -17,10 +17,14 @@ import {MatListModule} from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormField, MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ListAppointmentsComponent } from './list-appointments/list-appointments.component';
+import { AddAppointmentComponent } from './add-appointment/add-appointment.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ListAppointmentsComponent,
+    AddAppointmentComponent
   ],
   imports: [
     HttpClientModule,

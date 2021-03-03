@@ -1,6 +1,6 @@
-import { RestApiService, Appointment, BookAppointment, AppointmentType, FreeSlots } from './shared/rest-api.service';
-import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ListAppointmentsComponent } from './list-appointments/list-appointments.component';
+import { Component, ViewChild } from '@angular/core';
+
 import { _YAxis } from '@angular/cdk/scrolling';
 
 @Component({
@@ -9,84 +9,9 @@ import { _YAxis } from '@angular/cdk/scrolling';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  @ViewChild('listapp') listapp!:ListAppointmentsComponent;
+  
+  constructor() {
 
-  title = 'booking';
-  selectedAppointmentType : number | undefined = undefined;
-  appointmentTypes: Array<AppointmentType> = []; // TODO: from api
-
-  appointments: Array<Appointment> = [];
-  displayedColumns: string[] = ['DateTime', 'Type', 'User', 'Description'];
-  freeSlots: FreeSlots = new Map();
-  freeSlotsPage: number = 0;
-
-  form = new FormGroup({
-    appointmentDatetime: new FormControl('', [Validators.required]),
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required]),
-    birthDate: new FormControl('', [Validators.required]),
-    phone: new FormControl('', [Validators.required]),
-    description: new FormControl(''),
-  });
-
-  user = {firstName: "", lastName: ""};
-
-  constructor(public restApi: RestApiService) {
-    this.updateAppointments()
-    this.updateAppointmentTypes();
-  }
-
-  onSubmit() {
-    console.log("Submit");
-    console.log(this.form.value);
-
-    if(this.selectedAppointmentType !== undefined){
-      let bookAppointment: BookAppointment = {
-        begin: this.form.controls.appointmentDatetime.value,
-        appointmentTypeId: this.selectedAppointmentType,
-        userInformation: {
-          ...this.form.value,
-          birthDate: this.form.value.birthDate.toISOString().slice(0, 10)
-        }
-      }
-
-      this.restApi.addAppointment(bookAppointment).subscribe(() => {
-        this.selectedAppointmentType = undefined;
-        this.freeSlots = new Map();
-        this.updateAppointments();
-        this.form.reset();
-        this.freeSlotsPage = 0;
-      });
-    }
-  }
-
-  nextSlots() {
-    this.freeSlotsPage++;
-    this.updateFreeSlots();
-  }
-
-  previousSlots() {
-    this.freeSlotsPage--;
-    this.updateFreeSlots();
-  }
-
-  updateAppointments() {
-    this.form.controls.appointmentDatetime.setValue(undefined);
-    this.restApi.getAppointments().subscribe((data: Array<Appointment>) => {
-      this.appointments = data
-    })
-  }
-
-  updateFreeSlots() {
-    if(this.selectedAppointmentType !== undefined)
-      this.restApi.getFreeSlots(this.selectedAppointmentType, this.freeSlotsPage).subscribe((data) => {
-        this.freeSlots = data
-      })
-  }
-
-  updateAppointmentTypes() {
-    this.restApi.getAppointmentTypes().subscribe((data) => {
-      this.appointmentTypes = data;
-    })
   }
 }

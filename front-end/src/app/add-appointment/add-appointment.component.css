@@ -1,0 +1,17 @@
+mat-card {
+    max-width: 900px;
+    margin: 24px;
+}
+
+mat-radio-button {
+    display: block;
+}
+
+mat-card-title {
+    padding: 10px;
+    color: #3f51b5ed;
+}
+
+[hidden] {
+    display: none !important;
+}
