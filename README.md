@@ -33,6 +33,7 @@ Lastly enjoy in a browser to http://localhost:4200/ !
 
 ## Todo
 - config files and environment variables (e.g. port and urls)
+- sql database
 - docker files / CI build
 - integration tests
 - more checks of form values in back-end
